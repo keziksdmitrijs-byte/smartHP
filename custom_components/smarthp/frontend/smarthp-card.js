@@ -1,5 +1,5 @@
 /* SmartHP Lovelace card and sidebar panel. No external dependencies. */
-const SMARTHP_VERSION = "0.2.0";
+const SMARTHP_VERSION = "0.3.0";
 
 const TEXT = {
   en: {
@@ -44,8 +44,6 @@ const SECTIONS = [
   { id: "price", icon: "mdi:cash-clock", toggle: "price_control", hint: "priceHint",
     keys: ["cheap_percent", "cheap_offset", "expensive_percent", "expensive_offset",
       "abs_thresholds", "price_always_cheap", "price_always_expensive"] },
-  { id: "block", icon: "mdi:lock-clock", toggle: "hp_block",
-    keys: ["block_max_minutes", "block_pause_minutes", "block_min_outdoor"] },
   { id: "dhw", icon: "mdi:water-boiler", toggle: "dhw_price",
     keys: ["dhw_normal", "dhw_cheap", "dhw_expensive"] },
   { id: "legionella", icon: "mdi:bacteria", toggle: "legionella",

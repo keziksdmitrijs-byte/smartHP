@@ -12,14 +12,14 @@
           "price_sensor": "Savs cenas sensors iebūvētā Nord Pool vietā (nav obligāti)",
           "setpoint_entity": "Siltumsūkņa uzdotā vērtība (nav obligāti)",
           "setpoint_mode": "Ko ierakstīt uzdotajā vērtībā",
-          "block_switch": "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)",
+          "block_switch": "Siltumsūkņa apturēšanas kontakts (nav obligāti)",
           "block_inverted": "Ieslēgts kontakts = siltumsūknis bloķēts"
         },
         "data_description": {
           "nordpool_area": "SmartHP pats lejupielādē cenas; cita integrācija nav vajadzīga.",
           "price_sensor": "Atstājiet tukšu, lai izmantotu iebūvētās Nord Pool cenas.",
           "setpoint_entity": "Number vai climate entītija, kurā SmartHP ieraksta aprēķināto vērtību.",
-          "block_switch": "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
+          "block_switch": "Izmanto tikai neobligātā funkcija, kas aptur siltumsūkni papildu katla darbības laikā. Elektrības cena pati siltumsūkni neizslēdz, tikai nobīda uzdoto vērtību.",
           "block_inverted": "Atstājiet izslēgtu, ja ieslēgts kontakts atļauj siltumsūkņa darbību."
         }
       },
@@ -57,14 +57,14 @@
           "price_sensor": "Savs cenas sensors iebūvētā Nord Pool vietā (nav obligāti)",
           "setpoint_entity": "Siltumsūkņa uzdotā vērtība (nav obligāti)",
           "setpoint_mode": "Ko ierakstīt uzdotajā vērtībā",
-          "block_switch": "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)",
+          "block_switch": "Siltumsūkņa apturēšanas kontakts (nav obligāti)",
           "block_inverted": "Ieslēgts kontakts = siltumsūknis bloķēts"
         },
         "data_description": {
           "nordpool_area": "SmartHP pats lejupielādē cenas; cita integrācija nav vajadzīga.",
           "price_sensor": "Atstājiet tukšu, lai izmantotu iebūvētās Nord Pool cenas.",
           "setpoint_entity": "Number vai climate entītija, kurā SmartHP ieraksta aprēķināto vērtību.",
-          "block_switch": "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
+          "block_switch": "Izmanto tikai neobligātā funkcija, kas aptur siltumsūkni papildu katla darbības laikā. Elektrības cena pati siltumsūkni neizslēdz, tikai nobīda uzdoto vērtību.",
           "block_inverted": "Atstājiet izslēgtu, ja ieslēgts kontakts atļauj siltumsūkņa darbību."
         }
       },
@@ -161,15 +161,6 @@
       },
       "price_always_expensive": {
         "name": "Vienmēr dārgi virs cenas"
-      },
-      "block_max_minutes": {
-        "name": "Maks. bloķēšanas ilgums"
-      },
-      "block_pause_minutes": {
-        "name": "Pauze starp bloķēšanām"
-      },
-      "block_min_outdoor": {
-        "name": "Nebloķēt, ja ārā zem"
       },
       "summer_temp": {
         "name": "Vasaras režīms, ja ārā virs"
@@ -299,9 +290,6 @@
       },
       "abs_thresholds": {
         "name": "Absolūtie cenas sliekšņi"
-      },
-      "hp_block": {
-        "name": "Siltumsūkņa bloķēšana dārgajās stundās"
       },
       "summer_mode": {
         "name": "Automātiskais vasaras režīms"

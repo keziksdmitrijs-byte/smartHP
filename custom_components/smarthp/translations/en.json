@@ -12,14 +12,14 @@
           "price_sensor": "Own price sensor instead of built-in Nord Pool (optional)",
           "setpoint_entity": "Heat pump setpoint (optional)",
           "setpoint_mode": "What to write to the setpoint",
-          "block_switch": "Heat pump enable/block switch (optional)",
+          "block_switch": "Heat pump stop contact (optional)",
           "block_inverted": "Switch ON means the heat pump is blocked"
         },
         "data_description": {
           "nordpool_area": "SmartHP downloads the prices itself; no other integration is needed.",
           "price_sensor": "Leave empty to use the built-in Nord Pool prices.",
           "setpoint_entity": "Number or climate entity that SmartHP writes the calculated value to.",
-          "block_switch": "Relay used to stop the heat pump during expensive hours.",
+          "block_switch": "Used only by the optional function that stops the heat pump while the auxiliary heater runs. Electricity price alone never stops the heat pump, it only shifts the setpoint.",
           "block_inverted": "Leave off if the switch ON means the heat pump may run."
         }
       },
@@ -57,14 +57,14 @@
           "price_sensor": "Own price sensor instead of built-in Nord Pool (optional)",
           "setpoint_entity": "Heat pump setpoint (optional)",
           "setpoint_mode": "What to write to the setpoint",
-          "block_switch": "Heat pump enable/block switch (optional)",
+          "block_switch": "Heat pump stop contact (optional)",
           "block_inverted": "Switch ON means the heat pump is blocked"
         },
         "data_description": {
           "nordpool_area": "SmartHP downloads the prices itself; no other integration is needed.",
           "price_sensor": "Leave empty to use the built-in Nord Pool prices.",
           "setpoint_entity": "Number or climate entity that SmartHP writes the calculated value to.",
-          "block_switch": "Relay used to stop the heat pump during expensive hours.",
+          "block_switch": "Used only by the optional function that stops the heat pump while the auxiliary heater runs. Electricity price alone never stops the heat pump, it only shifts the setpoint.",
           "block_inverted": "Leave off if the switch ON means the heat pump may run."
         }
       },
@@ -161,15 +161,6 @@
       },
       "price_always_expensive": {
         "name": "Always expensive above price"
-      },
-      "block_max_minutes": {
-        "name": "Maximum block duration"
-      },
-      "block_pause_minutes": {
-        "name": "Pause between blocks"
-      },
-      "block_min_outdoor": {
-        "name": "No blocking below outdoor temperature"
       },
       "summer_temp": {
         "name": "Summer mode above outdoor temperature"
@@ -299,9 +290,6 @@
       },
       "abs_thresholds": {
         "name": "Absolute price thresholds"
-      },
-      "hp_block": {
-        "name": "Block heat pump in expensive hours"
       },
       "summer_mode": {
         "name": "Automatic summer mode"

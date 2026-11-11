@@ -121,8 +121,6 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._last_calc: datetime | None = None
         self._summer = False
         self._pv_active = False
-        self._block_since: datetime | None = None
-        self._pause_until: datetime | None = None
         self._was_enabled = True
         self._legionella_done: Any = None
         self._circ_temp_ok = False
@@ -498,35 +496,13 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 else:
                     self._aux_on_since = None
 
-        # --- heat pump blocking
+        # --- heat pump blocking: the price alone never stops the heat pump,
+        # it only shifts the setpoint. The only block is the optional
+        # "stop the heat pump while the auxiliary heater runs on price".
         blocked = False
         if F_BLOCK in self.features:
             if F_AUX in self.features and s["aux_blocks_hp"] and aux_price:
                 blocked = True
-                self._block_since = None
-            else:
-                want = bool(
-                    s["hp_block"]
-                    and level == LEVEL_EXPENSIVE
-                    and not legionella
-                    and (outdoor is None or outdoor >= s["block_min_outdoor"])
-                )
-                if self._pause_until and now >= self._pause_until:
-                    self._pause_until = None
-                if want and self._pause_until is None:
-                    if self._block_since is None:
-                        self._block_since = now
-                    if now - self._block_since >= timedelta(
-                        minutes=float(s["block_max_minutes"])
-                    ):
-                        self._block_since = None
-                        self._pause_until = now + timedelta(
-                            minutes=float(s["block_pause_minutes"])
-                        )
-                    else:
-                        blocked = True
-                else:
-                    self._block_since = None
 
         # --- SG Ready state
         sg_state = None

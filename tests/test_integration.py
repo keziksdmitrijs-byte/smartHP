@@ -115,7 +115,6 @@ async def test_minimal_setup_has_no_optional_entities(hass: HomeAssistant, freez
     assert hass.states.get("switch.smarthp_price_control") is not None
     for missing in (
         "switch.smarthp_circulation",
-        "switch.smarthp_hp_block",
         "switch.smarthp_aux_by_temp",
         "number.smarthp_dhw_normal",
         "number.smarthp_room_target",
@@ -123,30 +122,25 @@ async def test_minimal_setup_has_no_optional_entities(hass: HomeAssistant, freez
         assert hass.states.get(missing) is None
 
 
-async def test_expensive_hour_reduces_flow_and_blocks(hass: HomeAssistant, freezer):
+async def test_expensive_hour_only_shifts_setpoint(hass: HomeAssistant, freezer):
     _, calls = await _setup(hass, FULL, freezer, 20)
     assert hass.states.get("sensor.smarthp_price_level").state == "expensive"
-    # curve at -5 C = 37.5, minus 2 C in expensive hours
-    assert hass.states.get("sensor.smarthp_target_flow").state == "35.5"
-    assert _last_value(calls, "input_number.hp_flow") == 35.5
-    # blocking is off by default
+    # curve at -5 C = 37.5, minus 3 C in expensive hours
+    assert hass.states.get("sensor.smarthp_target_flow").state == "34.5"
+    assert _last_value(calls, "input_number.hp_flow") == 34.5
+    # the price never switches the heat pump off
+    assert hass.states.get("switch.smarthp_hp_block") is None
+    assert hass.states.get("binary_sensor.smarthp_hp_blocked").state == "off"
     assert not _switched(calls, "off", "switch.hp_enable")
-
-    await hass.services.async_call(
-        "switch", "turn_on", {"entity_id": "switch.smarthp_hp_block"}, blocking=True
-    )
-    await hass.async_block_till_done()
-    assert hass.states.get("binary_sensor.smarthp_hp_blocked").state == "on"
-    assert _switched(calls, "off", "switch.hp_enable")
-    assert _switched(calls, "on", "switch.sg1")  # SG Ready state 1
-    assert hass.states.get("sensor.smarthp_sg_state").state == "1"
-    assert hass.states.get("sensor.smarthp_status").state == "blocked"
+    assert not _switched(calls, "on", "switch.sg1")
+    assert hass.states.get("sensor.smarthp_sg_state").state == "2"
+    assert hass.states.get("sensor.smarthp_status").state == "saving"
 
 
 async def test_cheap_hour_boosts_flow_and_dhw(hass: HomeAssistant, freezer):
     _, calls = await _setup(hass, FULL, freezer, 3)
     assert hass.states.get("sensor.smarthp_price_level").state == "cheap"
-    assert _last_value(calls, "input_number.hp_flow") == 39.5
+    assert _last_value(calls, "input_number.hp_flow") == 40.5
     assert hass.states.get("sensor.smarthp_sg_state").state == "3"
     assert _switched(calls, "on", "switch.sg2")
     await hass.services.async_call(
@@ -173,7 +167,7 @@ async def test_offset_mode(hass: HomeAssistant, freezer):
     hass.states.async_set("input_number.hp_flow", "0", {"min": -10, "max": 10, "step": 1})
     coordinator = next(iter(hass.data[DOMAIN].values()))
     await coordinator.async_refresh()
-    assert _last_value(calls, "input_number.hp_flow") == -2
+    assert _last_value(calls, "input_number.hp_flow") == -3
 
 
 async def test_circulation_schedule_and_boiler_temperature(hass: HomeAssistant, freezer):
@@ -258,7 +252,11 @@ async def test_legionella_cycle(hass: HomeAssistant, freezer):
 async def test_disable_releases_block_and_unload(hass: HomeAssistant, freezer):
     entry, calls = await _setup(hass, FULL, freezer, 20)
     coordinator = next(iter(hass.data[DOMAIN].values()))
-    await coordinator.async_set_setting("hp_block", True)
+    # heater on price with "stop heat pump" -> blocked
+    await coordinator.async_set_setting("aux_by_price", True)
+    await coordinator.async_set_setting("aux_blocks_hp", True)
+    await coordinator.async_set_setting("aux_price_limit", 0.10)
+    assert _switched(calls, "off", "switch.hp_enable")
     hass.states.async_set("switch.hp_enable", "off")
     await coordinator.async_set_setting("enabled", False)
     assert hass.states.get("sensor.smarthp_status").state == "disabled"
@@ -328,7 +326,7 @@ async def test_builtin_nordpool(hass: HomeAssistant, freezer, aioclient_mock):
     assert price.attributes["periods_today"] == 96
     assert price.attributes["today_max"] == 0.2783
     assert hass.states.get("sensor.smarthp_price_level").state == "expensive"
-    assert _last_value(calls, "input_number.hp_flow") == 35.5
+    assert _last_value(calls, "input_number.hp_flow") == 34.5
     # yesterday + today are downloaded once; tomorrow answered 204 and is not retried at once
     count = aioclient_mock.call_count
     assert count == 3
@@ -339,7 +337,7 @@ async def test_builtin_nordpool(hass: HomeAssistant, freezer, aioclient_mock):
     freezer.move_to(datetime(2026, 1, 5, 3, 30, tzinfo=dt_util.get_time_zone("Europe/Riga")))
     await coordinator.async_refresh()
     assert hass.states.get("sensor.smarthp_price_level").state == "cheap"
-    assert _last_value(calls, "input_number.hp_flow") == 39.5
+    assert _last_value(calls, "input_number.hp_flow") == 40.5
 
 
 async def test_builtin_nordpool_offline(hass: HomeAssistant, freezer, aioclient_mock):

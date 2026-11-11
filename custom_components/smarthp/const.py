@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 DOMAIN = "smarthp"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 PLATFORMS = ["binary_sensor", "number", "select", "sensor", "switch", "time"]
 
 FRONTEND_URL = "/smarthp_static/smarthp-card.js"
@@ -144,14 +144,10 @@ NUMBERS: tuple[NumberDesc, ...] = (
     # price
     NumberDesc("cheap_percent", 30, 0, 100, 5, "%", icon="mdi:percent"),
     NumberDesc("expensive_percent", 25, 0, 100, 5, "%", icon="mdi:percent"),
-    NumberDesc("cheap_offset", 2, 0, 15, 0.5, C, icon="mdi:thermometer-plus"),
-    NumberDesc("expensive_offset", 2, 0, 15, 0.5, C, icon="mdi:thermometer-minus"),
+    NumberDesc("cheap_offset", 3, 0, 15, 0.5, C, icon="mdi:thermometer-plus"),
+    NumberDesc("expensive_offset", 3, 0, 15, 0.5, C, icon="mdi:thermometer-minus"),
     NumberDesc("price_always_cheap", 0.05, PRICE_MIN, PRICE_MAX, PRICE_STEP, icon="mdi:cash-minus"),
     NumberDesc("price_always_expensive", 0.30, PRICE_MIN, PRICE_MAX, PRICE_STEP, icon="mdi:cash-plus"),
-    # blocking
-    NumberDesc("block_max_minutes", 120, 15, 720, 15, "min", (F_BLOCK,), "mdi:timer-lock"),
-    NumberDesc("block_pause_minutes", 60, 15, 720, 15, "min", (F_BLOCK,), "mdi:timer-play"),
-    NumberDesc("block_min_outdoor", -10, -40, 20, 0.5, C, (F_BLOCK,), "mdi:snowflake-alert"),
     # summer / room / night / vacation / pv
     NumberDesc("summer_temp", 16, 5, 30, 0.5, C, icon="mdi:white-balance-sunny"),
     NumberDesc("room_target", 21, 10, 30, 0.5, C, (F_ROOM,), "mdi:home-thermometer"),
@@ -180,7 +176,6 @@ SWITCHES: tuple[SwitchDesc, ...] = (
     SwitchDesc("enabled", True, icon="mdi:power", config=False),
     SwitchDesc("price_control", True, icon="mdi:cash-clock"),
     SwitchDesc("abs_thresholds", False, icon="mdi:cash-lock"),
-    SwitchDesc("hp_block", False, (F_BLOCK,), "mdi:lock-clock"),
     SwitchDesc("summer_mode", True, icon="mdi:white-balance-sunny"),
     SwitchDesc("room_compensation", False, (F_ROOM,), "mdi:home-thermometer"),
     SwitchDesc("night_setback", False, icon="mdi:weather-night"),

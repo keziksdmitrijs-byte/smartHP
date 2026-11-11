@@ -28,9 +28,6 @@ NUMBER = {
     "expensive_offset": ("Flow reduction in expensive hours", "Снижение подачи в дорогие часы", "Turpgaitas pazeminājums dārgajās stundās"),
     "price_always_cheap": ("Always cheap below price", "Всегда дёшево ниже цены", "Vienmēr lēti zem cenas"),
     "price_always_expensive": ("Always expensive above price", "Всегда дорого выше цены", "Vienmēr dārgi virs cenas"),
-    "block_max_minutes": ("Maximum block duration", "Макс. длительность блокировки", "Maks. bloķēšanas ilgums"),
-    "block_pause_minutes": ("Pause between blocks", "Пауза между блокировками", "Pauze starp bloķēšanām"),
-    "block_min_outdoor": ("No blocking below outdoor temperature", "Не блокировать при наружной ниже", "Nebloķēt, ja ārā zem"),
     "summer_temp": ("Summer mode above outdoor temperature", "Летний режим при наружной выше", "Vasaras režīms, ja ārā virs"),
     "room_target": ("Room target temperature", "Заданная температура в помещении", "Telpas uzdotā temperatūra"),
     "room_factor": ("Room influence factor", "Коэффициент влияния помещения", "Telpas ietekmes koeficients"),
@@ -55,7 +52,6 @@ SWITCH = {
     "enabled": ("Control enabled", "Управление включено", "Vadība ieslēgta"),
     "price_control": ("Price-based flow adjustment", "Коррекция подачи по цене", "Turpgaitas korekcija pēc cenas"),
     "abs_thresholds": ("Absolute price thresholds", "Абсолютные пороги цены", "Absolūtie cenas sliekšņi"),
-    "hp_block": ("Block heat pump in expensive hours", "Блокировка насоса в дорогие часы", "Siltumsūkņa bloķēšana dārgajās stundās"),
     "summer_mode": ("Automatic summer mode", "Автоматический летний режим", "Automātiskais vasaras režīms"),
     "room_compensation": ("Room temperature compensation", "Коррекция по температуре помещения", "Korekcija pēc telpas temperatūras"),
     "night_setback": ("Night setback", "Ночное снижение", "Nakts pazeminājums"),
@@ -169,11 +165,11 @@ MAIN_FIELDS = {
         None,
     ),
     "block_switch": (
-        ("Heat pump enable/block switch (optional)", "Контакт разрешения/блокировки насоса (необязательно)", "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)"),
+        ("Heat pump stop contact (optional)", "Контакт остановки насоса (необязательно)", "Siltumsūkņa apturēšanas kontakts (nav obligāti)"),
         (
-            "Relay used to stop the heat pump during expensive hours.",
-            "Реле, которым тепловой насос останавливается в дорогие часы.",
-            "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
+            "Used only by the optional function that stops the heat pump while the auxiliary heater runs. Electricity price alone never stops the heat pump, it only shifts the setpoint.",
+            "Используется только необязательной функцией остановки насоса на время работы доп. котла. Сама цена электричества насос не выключает, а только сдвигает уставку.",
+            "Izmanto tikai neobligātā funkcija, kas aptur siltumsūkni papildu katla darbības laikā. Elektrības cena pati siltumsūkni neizslēdz, tikai nobīda uzdoto vērtību.",
         ),
     ),
     "block_inverted": (
