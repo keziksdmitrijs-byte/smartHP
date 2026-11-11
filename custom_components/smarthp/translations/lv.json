@@ -1,0 +1,367 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "SmartHP: galvenās entītijas",
+        "description": "Izvēlieties sensorus, kurus SmartHP nolasa, un siltumsūkņa entītijas, kuras tas vada.",
+        "data": {
+          "name": "Nosaukums",
+          "outdoor_sensor": "Āra temperatūras sensors",
+          "price_sensor": "Elektrības cenas sensors (Nord Pool)",
+          "setpoint_entity": "Siltumsūkņa uzdotā vērtība (nav obligāti)",
+          "setpoint_mode": "Ko ierakstīt uzdotajā vērtībā",
+          "block_switch": "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)",
+          "block_inverted": "Ieslēgts kontakts = siltumsūknis bloķēts"
+        },
+        "data_description": {
+          "price_sensor": "Nord Pool integrācijas (oficiālās vai HACS) pašreizējās cenas sensors.",
+          "setpoint_entity": "Number vai climate entītija, kurā SmartHP ieraksta aprēķināto vērtību.",
+          "block_switch": "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
+          "block_inverted": "Atstājiet izslēgtu, ja ieslēgts kontakts atļauj siltumsūkņa darbību."
+        }
+      },
+      "optional": {
+        "title": "SmartHP: papildu funkcijas",
+        "description": "Visi lauki nav obligāti. Funkcija parādās tikai tad, ja izvēlēta tās entītija.",
+        "data": {
+          "circulation_pump": "Karstā ūdens cirkulācijas sūknis",
+          "dhw_sensor": "Boilera ūdens temperatūras sensors",
+          "dhw_setpoint_entity": "Karstā ūdens uzdotā temperatūra",
+          "aux_heater": "Papildu katla kontakts",
+          "room_sensor": "Telpas temperatūras sensors",
+          "pv_sensor": "Saules enerģijas pārpalikuma jaudas sensors (W)",
+          "sg_ready_1": "SG Ready kontakts 1 (A)",
+          "sg_ready_2": "SG Ready kontakts 2 (B)"
+        },
+        "data_description": {
+          "pv_sensor": "Pozitīva vērtība = tīklā nodotā jauda."
+        }
+      }
+    },
+    "error": {
+      "sg_both": "SG Ready vajadzīgi abi kontakti."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SmartHP: galvenās entītijas",
+        "description": "Izvēlieties sensorus, kurus SmartHP nolasa, un siltumsūkņa entītijas, kuras tas vada.",
+        "data": {
+          "outdoor_sensor": "Āra temperatūras sensors",
+          "price_sensor": "Elektrības cenas sensors (Nord Pool)",
+          "setpoint_entity": "Siltumsūkņa uzdotā vērtība (nav obligāti)",
+          "setpoint_mode": "Ko ierakstīt uzdotajā vērtībā",
+          "block_switch": "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)",
+          "block_inverted": "Ieslēgts kontakts = siltumsūknis bloķēts"
+        },
+        "data_description": {
+          "price_sensor": "Nord Pool integrācijas (oficiālās vai HACS) pašreizējās cenas sensors.",
+          "setpoint_entity": "Number vai climate entītija, kurā SmartHP ieraksta aprēķināto vērtību.",
+          "block_switch": "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
+          "block_inverted": "Atstājiet izslēgtu, ja ieslēgts kontakts atļauj siltumsūkņa darbību."
+        }
+      },
+      "optional": {
+        "title": "SmartHP: papildu funkcijas",
+        "description": "Visi lauki nav obligāti. Funkcija parādās tikai tad, ja izvēlēta tās entītija.",
+        "data": {
+          "circulation_pump": "Karstā ūdens cirkulācijas sūknis",
+          "dhw_sensor": "Boilera ūdens temperatūras sensors",
+          "dhw_setpoint_entity": "Karstā ūdens uzdotā temperatūra",
+          "aux_heater": "Papildu katla kontakts",
+          "room_sensor": "Telpas temperatūras sensors",
+          "pv_sensor": "Saules enerģijas pārpalikuma jaudas sensors (W)",
+          "sg_ready_1": "SG Ready kontakts 1 (A)",
+          "sg_ready_2": "SG Ready kontakts 2 (B)"
+        },
+        "data_description": {
+          "pv_sensor": "Pozitīva vērtība = tīklā nodotā jauda."
+        }
+      }
+    },
+    "error": {
+      "sg_both": "SG Ready vajadzīgi abi kontakti."
+    }
+  },
+  "selector": {
+    "setpoint_mode": {
+      "options": {
+        "flow": "Turpgaitas temperatūru (SmartHP līkne)",
+        "offset": "Tikai nobīdi (līkne paliek siltumsūknī)"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "summer_active": {
+        "name": "Vasaras režīms aktīvs"
+      },
+      "hp_blocked": {
+        "name": "Siltumsūknis bloķēts"
+      },
+      "legionella_active": {
+        "name": "Notiek antilegionella"
+      },
+      "circ_demand": {
+        "name": "Cirkulācijas sūknis"
+      },
+      "aux_demand": {
+        "name": "Papildu katls"
+      }
+    },
+    "number": {
+      "curve_m20": {
+        "name": "Turpgaita pie −20 °C ārā"
+      },
+      "curve_m10": {
+        "name": "Turpgaita pie −10 °C ārā"
+      },
+      "curve_0": {
+        "name": "Turpgaita pie 0 °C ārā"
+      },
+      "curve_p10": {
+        "name": "Turpgaita pie +10 °C ārā"
+      },
+      "curve_p20": {
+        "name": "Turpgaita pie +20 °C ārā"
+      },
+      "curve_shift": {
+        "name": "Līknes paralēlā nobīde"
+      },
+      "flow_min": {
+        "name": "Min. turpgaitas temperatūra"
+      },
+      "flow_max": {
+        "name": "Maks. turpgaitas temperatūra"
+      },
+      "outdoor_filter": {
+        "name": "Āra temperatūras vidējošana"
+      },
+      "cheap_percent": {
+        "name": "Lēto stundu daļa diennaktī"
+      },
+      "expensive_percent": {
+        "name": "Dārgo stundu daļa diennaktī"
+      },
+      "cheap_offset": {
+        "name": "Turpgaitas paaugstinājums lētajās stundās"
+      },
+      "expensive_offset": {
+        "name": "Turpgaitas pazeminājums dārgajās stundās"
+      },
+      "price_always_cheap": {
+        "name": "Vienmēr lēti zem cenas"
+      },
+      "price_always_expensive": {
+        "name": "Vienmēr dārgi virs cenas"
+      },
+      "block_max_minutes": {
+        "name": "Maks. bloķēšanas ilgums"
+      },
+      "block_pause_minutes": {
+        "name": "Pauze starp bloķēšanām"
+      },
+      "block_min_outdoor": {
+        "name": "Nebloķēt, ja ārā zem"
+      },
+      "summer_temp": {
+        "name": "Vasaras režīms, ja ārā virs"
+      },
+      "room_target": {
+        "name": "Telpas uzdotā temperatūra"
+      },
+      "room_factor": {
+        "name": "Telpas ietekmes koeficients"
+      },
+      "night_setback_temp": {
+        "name": "Nakts turpgaitas pazeminājums"
+      },
+      "vacation_setback_temp": {
+        "name": "Turpgaitas pazeminājums atvaļinājumā"
+      },
+      "pv_threshold": {
+        "name": "Saules enerģijas pārpalikuma slieksnis"
+      },
+      "pv_offset": {
+        "name": "Turpgaitas paaugstinājums pie PV pārpalikuma"
+      },
+      "dhw_normal": {
+        "name": "Karstā ūdens temperatūra, parastā"
+      },
+      "dhw_cheap": {
+        "name": "Karstā ūdens temperatūra lētajās stundās"
+      },
+      "dhw_expensive": {
+        "name": "Karstā ūdens temperatūra dārgajās stundās"
+      },
+      "legionella_temp": {
+        "name": "Antilegionellas temperatūra"
+      },
+      "circ_min_temp": {
+        "name": "Min. boilera temperatūra cirkulācijai"
+      },
+      "circ_on_minutes": {
+        "name": "Cirkulācija: darbība"
+      },
+      "circ_off_minutes": {
+        "name": "Cirkulācija: pauze (0 = nepārtraukti)"
+      },
+      "aux_outdoor_temp": {
+        "name": "Papildu katls, ja ārā zem"
+      },
+      "aux_hysteresis": {
+        "name": "Papildu katla histerēze"
+      },
+      "aux_price_limit": {
+        "name": "Papildu katls, ja cena virs"
+      },
+      "aux_min_run": {
+        "name": "Papildu katla min. darbības laiks"
+      }
+    },
+    "select": {
+      "legionella_day": {
+        "name": "Antilegionellas diena",
+        "state": {
+          "mon": "Pirmdiena",
+          "tue": "Otrdiena",
+          "wed": "Trešdiena",
+          "thu": "Ceturtdiena",
+          "fri": "Piektdiena",
+          "sat": "Sestdiena",
+          "sun": "Svētdiena"
+        }
+      }
+    },
+    "sensor": {
+      "status": {
+        "name": "Statuss",
+        "state": {
+          "disabled": "Izslēgts",
+          "no_data": "Nav datu",
+          "blocked": "Bloķēts",
+          "legionella": "Antilegionella",
+          "summer": "Vasara",
+          "vacation": "Atvaļinājums",
+          "pv_boost": "PV pārpalikums",
+          "boost": "Lēti - uzsildīšana",
+          "saving": "Dārgi - taupīšana",
+          "normal": "Normāls"
+        }
+      },
+      "target_flow": {
+        "name": "Mērķa turpgaitas temperatūra"
+      },
+      "curve_flow": {
+        "name": "Turpgaita pēc līknes"
+      },
+      "total_offset": {
+        "name": "Kopējā turpgaitas korekcija"
+      },
+      "outdoor_filtered": {
+        "name": "Vidējotā āra temperatūra"
+      },
+      "price_level": {
+        "name": "Cenas līmenis",
+        "state": {
+          "cheap": "Lēti",
+          "normal": "Normāli",
+          "expensive": "Dārgi",
+          "unknown": "Nav zināms"
+        }
+      },
+      "price_rank": {
+        "name": "Cenas vieta diennaktī"
+      },
+      "dhw_target": {
+        "name": "Karstā ūdens mērķa temperatūra"
+      },
+      "sg_state": {
+        "name": "SG Ready stāvoklis"
+      }
+    },
+    "switch": {
+      "enabled": {
+        "name": "Vadība ieslēgta"
+      },
+      "price_control": {
+        "name": "Turpgaitas korekcija pēc cenas"
+      },
+      "abs_thresholds": {
+        "name": "Absolūtie cenas sliekšņi"
+      },
+      "hp_block": {
+        "name": "Siltumsūkņa bloķēšana dārgajās stundās"
+      },
+      "summer_mode": {
+        "name": "Automātiskais vasaras režīms"
+      },
+      "room_compensation": {
+        "name": "Korekcija pēc telpas temperatūras"
+      },
+      "night_setback": {
+        "name": "Nakts pazeminājums"
+      },
+      "vacation": {
+        "name": "Atvaļinājuma režīms"
+      },
+      "pv_boost": {
+        "name": "PV pārpalikuma izmantošana"
+      },
+      "dhw_price": {
+        "name": "Karstais ūdens pēc cenas"
+      },
+      "legionella": {
+        "name": "Aizsardzība pret legionellu"
+      },
+      "circulation": {
+        "name": "Cirkulācijas sūkņa vadība"
+      },
+      "circ_use_temp": {
+        "name": "Cirkulācija tikai ar karstu boileri"
+      },
+      "circ_antiseize": {
+        "name": "Sūkņa aizsardzība pret iestrēgšanu"
+      },
+      "aux_by_temp": {
+        "name": "Papildu katls pēc āra temperatūras"
+      },
+      "aux_by_price": {
+        "name": "Papildu katls pēc elektrības cenas"
+      },
+      "aux_blocks_hp": {
+        "name": "Apturēt siltumsūkni, kad katls strādā pēc cenas"
+      }
+    },
+    "time": {
+      "night_start": {
+        "name": "Nakts pazeminājums: sākums"
+      },
+      "night_end": {
+        "name": "Nakts pazeminājums: beigas"
+      },
+      "legionella_time": {
+        "name": "Antilegionellas laiks"
+      },
+      "circ1_start": {
+        "name": "Cirkulācija, periods 1: sākums"
+      },
+      "circ1_end": {
+        "name": "Cirkulācija, periods 1: beigas"
+      },
+      "circ2_start": {
+        "name": "Cirkulācija, periods 2: sākums"
+      },
+      "circ2_end": {
+        "name": "Cirkulācija, periods 2: beigas"
+      },
+      "circ3_start": {
+        "name": "Cirkulācija, periods 3: sākums"
+      },
+      "circ3_end": {
+        "name": "Cirkulācija, periods 3: beigas"
+      }
+    }
+  }
+}

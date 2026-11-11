@@ -1,0 +1,10 @@
+# Панель SmartHP: Настройки → Панели → Добавить панель → Новая панель с нуля,
+# затем ⋮ → Текстовый редактор и вставьте этот текст.
+title: SmartHP
+views:
+  - title: Тепловой насос
+    path: smarthp
+    icon: mdi:heat-pump
+    type: panel
+    cards:
+      - type: custom:smarthp-card

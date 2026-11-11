@@ -1,0 +1,367 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "SmartHP: main entities",
+        "description": "Choose the sensors SmartHP reads and the heat pump entities it controls.",
+        "data": {
+          "name": "Name",
+          "outdoor_sensor": "Outdoor temperature sensor",
+          "price_sensor": "Electricity price sensor (Nord Pool)",
+          "setpoint_entity": "Heat pump setpoint (optional)",
+          "setpoint_mode": "What to write to the setpoint",
+          "block_switch": "Heat pump enable/block switch (optional)",
+          "block_inverted": "Switch ON means the heat pump is blocked"
+        },
+        "data_description": {
+          "price_sensor": "Current price sensor of the Nord Pool integration (official or HACS).",
+          "setpoint_entity": "Number or climate entity that SmartHP writes the calculated value to.",
+          "block_switch": "Relay used to stop the heat pump during expensive hours.",
+          "block_inverted": "Leave off if the switch ON means the heat pump may run."
+        }
+      },
+      "optional": {
+        "title": "SmartHP: additional functions",
+        "description": "All fields are optional. A function appears only if its entity is selected.",
+        "data": {
+          "circulation_pump": "Hot water circulation pump",
+          "dhw_sensor": "Boiler (hot water) temperature sensor",
+          "dhw_setpoint_entity": "Hot water setpoint",
+          "aux_heater": "Auxiliary heater contact",
+          "room_sensor": "Room temperature sensor",
+          "pv_sensor": "PV surplus power sensor (W)",
+          "sg_ready_1": "SG Ready contact 1 (A)",
+          "sg_ready_2": "SG Ready contact 2 (B)"
+        },
+        "data_description": {
+          "pv_sensor": "Positive value = power exported to the grid."
+        }
+      }
+    },
+    "error": {
+      "sg_both": "SG Ready needs both contacts."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SmartHP: main entities",
+        "description": "Choose the sensors SmartHP reads and the heat pump entities it controls.",
+        "data": {
+          "outdoor_sensor": "Outdoor temperature sensor",
+          "price_sensor": "Electricity price sensor (Nord Pool)",
+          "setpoint_entity": "Heat pump setpoint (optional)",
+          "setpoint_mode": "What to write to the setpoint",
+          "block_switch": "Heat pump enable/block switch (optional)",
+          "block_inverted": "Switch ON means the heat pump is blocked"
+        },
+        "data_description": {
+          "price_sensor": "Current price sensor of the Nord Pool integration (official or HACS).",
+          "setpoint_entity": "Number or climate entity that SmartHP writes the calculated value to.",
+          "block_switch": "Relay used to stop the heat pump during expensive hours.",
+          "block_inverted": "Leave off if the switch ON means the heat pump may run."
+        }
+      },
+      "optional": {
+        "title": "SmartHP: additional functions",
+        "description": "All fields are optional. A function appears only if its entity is selected.",
+        "data": {
+          "circulation_pump": "Hot water circulation pump",
+          "dhw_sensor": "Boiler (hot water) temperature sensor",
+          "dhw_setpoint_entity": "Hot water setpoint",
+          "aux_heater": "Auxiliary heater contact",
+          "room_sensor": "Room temperature sensor",
+          "pv_sensor": "PV surplus power sensor (W)",
+          "sg_ready_1": "SG Ready contact 1 (A)",
+          "sg_ready_2": "SG Ready contact 2 (B)"
+        },
+        "data_description": {
+          "pv_sensor": "Positive value = power exported to the grid."
+        }
+      }
+    },
+    "error": {
+      "sg_both": "SG Ready needs both contacts."
+    }
+  },
+  "selector": {
+    "setpoint_mode": {
+      "options": {
+        "flow": "Flow temperature (SmartHP heating curve)",
+        "offset": "Offset only (the heat pump keeps its own curve)"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "summer_active": {
+        "name": "Summer mode active"
+      },
+      "hp_blocked": {
+        "name": "Heat pump blocked"
+      },
+      "legionella_active": {
+        "name": "Legionella cycle running"
+      },
+      "circ_demand": {
+        "name": "Circulation pump"
+      },
+      "aux_demand": {
+        "name": "Auxiliary heater"
+      }
+    },
+    "number": {
+      "curve_m20": {
+        "name": "Flow temperature at −20 °C outdoor"
+      },
+      "curve_m10": {
+        "name": "Flow temperature at −10 °C outdoor"
+      },
+      "curve_0": {
+        "name": "Flow temperature at 0 °C outdoor"
+      },
+      "curve_p10": {
+        "name": "Flow temperature at +10 °C outdoor"
+      },
+      "curve_p20": {
+        "name": "Flow temperature at +20 °C outdoor"
+      },
+      "curve_shift": {
+        "name": "Curve parallel shift"
+      },
+      "flow_min": {
+        "name": "Minimum flow temperature"
+      },
+      "flow_max": {
+        "name": "Maximum flow temperature"
+      },
+      "outdoor_filter": {
+        "name": "Outdoor temperature damping"
+      },
+      "cheap_percent": {
+        "name": "Cheap share of the day"
+      },
+      "expensive_percent": {
+        "name": "Expensive share of the day"
+      },
+      "cheap_offset": {
+        "name": "Flow boost in cheap hours"
+      },
+      "expensive_offset": {
+        "name": "Flow reduction in expensive hours"
+      },
+      "price_always_cheap": {
+        "name": "Always cheap below price"
+      },
+      "price_always_expensive": {
+        "name": "Always expensive above price"
+      },
+      "block_max_minutes": {
+        "name": "Maximum block duration"
+      },
+      "block_pause_minutes": {
+        "name": "Pause between blocks"
+      },
+      "block_min_outdoor": {
+        "name": "No blocking below outdoor temperature"
+      },
+      "summer_temp": {
+        "name": "Summer mode above outdoor temperature"
+      },
+      "room_target": {
+        "name": "Room target temperature"
+      },
+      "room_factor": {
+        "name": "Room influence factor"
+      },
+      "night_setback_temp": {
+        "name": "Night flow reduction"
+      },
+      "vacation_setback_temp": {
+        "name": "Vacation flow reduction"
+      },
+      "pv_threshold": {
+        "name": "PV surplus threshold"
+      },
+      "pv_offset": {
+        "name": "Flow boost on PV surplus"
+      },
+      "dhw_normal": {
+        "name": "Hot water temperature, normal"
+      },
+      "dhw_cheap": {
+        "name": "Hot water temperature in cheap hours"
+      },
+      "dhw_expensive": {
+        "name": "Hot water temperature in expensive hours"
+      },
+      "legionella_temp": {
+        "name": "Legionella cycle temperature"
+      },
+      "circ_min_temp": {
+        "name": "Circulation minimum boiler temperature"
+      },
+      "circ_on_minutes": {
+        "name": "Circulation run time"
+      },
+      "circ_off_minutes": {
+        "name": "Circulation pause (0 = continuous)"
+      },
+      "aux_outdoor_temp": {
+        "name": "Auxiliary heater below outdoor temperature"
+      },
+      "aux_hysteresis": {
+        "name": "Auxiliary heater hysteresis"
+      },
+      "aux_price_limit": {
+        "name": "Auxiliary heater above electricity price"
+      },
+      "aux_min_run": {
+        "name": "Auxiliary heater minimum run time"
+      }
+    },
+    "select": {
+      "legionella_day": {
+        "name": "Legionella cycle day",
+        "state": {
+          "mon": "Monday",
+          "tue": "Tuesday",
+          "wed": "Wednesday",
+          "thu": "Thursday",
+          "fri": "Friday",
+          "sat": "Saturday",
+          "sun": "Sunday"
+        }
+      }
+    },
+    "sensor": {
+      "status": {
+        "name": "Status",
+        "state": {
+          "disabled": "Off",
+          "no_data": "No data",
+          "blocked": "Blocked",
+          "legionella": "Legionella cycle",
+          "summer": "Summer",
+          "vacation": "Vacation",
+          "pv_boost": "PV surplus",
+          "boost": "Cheap - boosting",
+          "saving": "Expensive - saving",
+          "normal": "Normal"
+        }
+      },
+      "target_flow": {
+        "name": "Target flow temperature"
+      },
+      "curve_flow": {
+        "name": "Curve flow temperature"
+      },
+      "total_offset": {
+        "name": "Total flow offset"
+      },
+      "outdoor_filtered": {
+        "name": "Damped outdoor temperature"
+      },
+      "price_level": {
+        "name": "Price level",
+        "state": {
+          "cheap": "Cheap",
+          "normal": "Normal",
+          "expensive": "Expensive",
+          "unknown": "Unknown"
+        }
+      },
+      "price_rank": {
+        "name": "Price rank today"
+      },
+      "dhw_target": {
+        "name": "Hot water target"
+      },
+      "sg_state": {
+        "name": "SG Ready state"
+      }
+    },
+    "switch": {
+      "enabled": {
+        "name": "Control enabled"
+      },
+      "price_control": {
+        "name": "Price-based flow adjustment"
+      },
+      "abs_thresholds": {
+        "name": "Absolute price thresholds"
+      },
+      "hp_block": {
+        "name": "Block heat pump in expensive hours"
+      },
+      "summer_mode": {
+        "name": "Automatic summer mode"
+      },
+      "room_compensation": {
+        "name": "Room temperature compensation"
+      },
+      "night_setback": {
+        "name": "Night setback"
+      },
+      "vacation": {
+        "name": "Vacation mode"
+      },
+      "pv_boost": {
+        "name": "PV surplus boost"
+      },
+      "dhw_price": {
+        "name": "Hot water by price"
+      },
+      "legionella": {
+        "name": "Legionella protection"
+      },
+      "circulation": {
+        "name": "Circulation pump control"
+      },
+      "circ_use_temp": {
+        "name": "Circulation only with hot boiler"
+      },
+      "circ_antiseize": {
+        "name": "Pump anti-seize run"
+      },
+      "aux_by_temp": {
+        "name": "Auxiliary heater by outdoor temperature"
+      },
+      "aux_by_price": {
+        "name": "Auxiliary heater by electricity price"
+      },
+      "aux_blocks_hp": {
+        "name": "Stop heat pump while heater runs on price"
+      }
+    },
+    "time": {
+      "night_start": {
+        "name": "Night setback start"
+      },
+      "night_end": {
+        "name": "Night setback end"
+      },
+      "legionella_time": {
+        "name": "Legionella cycle time"
+      },
+      "circ1_start": {
+        "name": "Circulation period 1 start"
+      },
+      "circ1_end": {
+        "name": "Circulation period 1 end"
+      },
+      "circ2_start": {
+        "name": "Circulation period 2 start"
+      },
+      "circ2_end": {
+        "name": "Circulation period 2 end"
+      },
+      "circ3_start": {
+        "name": "Circulation period 3 start"
+      },
+      "circ3_end": {
+        "name": "Circulation period 3 end"
+      }
+    }
+  }
+}
