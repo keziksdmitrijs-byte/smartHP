@@ -7,14 +7,17 @@
         "data": {
           "name": "Nosaukums",
           "outdoor_sensor": "Āra temperatūras sensors",
-          "price_sensor": "Elektrības cenas sensors (Nord Pool)",
+          "nordpool_area": "Nord Pool cenu zona",
+          "vat_percent": "Cenai pieskaitāmais PVN",
+          "price_sensor": "Savs cenas sensors iebūvētā Nord Pool vietā (nav obligāti)",
           "setpoint_entity": "Siltumsūkņa uzdotā vērtība (nav obligāti)",
           "setpoint_mode": "Ko ierakstīt uzdotajā vērtībā",
           "block_switch": "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)",
           "block_inverted": "Ieslēgts kontakts = siltumsūknis bloķēts"
         },
         "data_description": {
-          "price_sensor": "Nord Pool integrācijas (oficiālās vai HACS) pašreizējās cenas sensors.",
+          "nordpool_area": "SmartHP pats lejupielādē cenas; cita integrācija nav vajadzīga.",
+          "price_sensor": "Atstājiet tukšu, lai izmantotu iebūvētās Nord Pool cenas.",
           "setpoint_entity": "Number vai climate entītija, kurā SmartHP ieraksta aprēķināto vērtību.",
           "block_switch": "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
           "block_inverted": "Atstājiet izslēgtu, ja ieslēgts kontakts atļauj siltumsūkņa darbību."
@@ -49,14 +52,17 @@
         "description": "Izvēlieties sensorus, kurus SmartHP nolasa, un siltumsūkņa entītijas, kuras tas vada.",
         "data": {
           "outdoor_sensor": "Āra temperatūras sensors",
-          "price_sensor": "Elektrības cenas sensors (Nord Pool)",
+          "nordpool_area": "Nord Pool cenu zona",
+          "vat_percent": "Cenai pieskaitāmais PVN",
+          "price_sensor": "Savs cenas sensors iebūvētā Nord Pool vietā (nav obligāti)",
           "setpoint_entity": "Siltumsūkņa uzdotā vērtība (nav obligāti)",
           "setpoint_mode": "Ko ierakstīt uzdotajā vērtībā",
           "block_switch": "Siltumsūkņa atļaujas/bloķēšanas kontakts (nav obligāti)",
           "block_inverted": "Ieslēgts kontakts = siltumsūknis bloķēts"
         },
         "data_description": {
-          "price_sensor": "Nord Pool integrācijas (oficiālās vai HACS) pašreizējās cenas sensors.",
+          "nordpool_area": "SmartHP pats lejupielādē cenas; cita integrācija nav vajadzīga.",
+          "price_sensor": "Atstājiet tukšu, lai izmantotu iebūvētās Nord Pool cenas.",
           "setpoint_entity": "Number vai climate entītija, kurā SmartHP ieraksta aprēķināto vērtību.",
           "block_switch": "Relejs, ar kuru siltumsūknis tiek apturēts dārgajās stundās.",
           "block_inverted": "Atstājiet izslēgtu, ja ieslēgts kontakts atļauj siltumsūkņa darbību."
@@ -273,6 +279,9 @@
       },
       "price_rank": {
         "name": "Cenas vieta diennaktī"
+      },
+      "current_price": {
+        "name": "Elektrības cena"
       },
       "dhw_target": {
         "name": "Karstā ūdens mērķa temperatūra"

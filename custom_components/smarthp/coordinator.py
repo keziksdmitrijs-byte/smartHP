@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_ON
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -21,6 +22,7 @@ from .const import (
     ANTISEIZE_INTERVAL_HOURS,
     ANTISEIZE_RUN_SECONDS,
     CIRC_TEMP_HYSTERESIS,
+    CONF_AREA,
     CONF_AUX,
     CONF_BLOCK,
     CONF_BLOCK_INVERTED,
@@ -35,7 +37,10 @@ from .const import (
     CONF_SETPOINT_MODE,
     CONF_SG1,
     CONF_SG2,
+    CONF_VAT,
     CURVE_POINTS,
+    DEFAULT_AREA,
+    DEFAULT_VAT,
     DOMAIN,
     F_AUX,
     F_BLOCK,
@@ -49,6 +54,8 @@ from .const import (
     LEVEL_CHEAP,
     LEVEL_EXPENSIVE,
     MODE_OFFSET,
+    NORDPOOL_TIMEZONE,
+    NORDPOOL_URL,
     SUMMER_HYSTERESIS,
     WEEKDAYS,
     default_settings,
@@ -106,6 +113,8 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         ):
             if self.conf.get(conf_key):
                 self.features.add(feature)
+        if not self.conf.get(CONF_PRICE):
+            self.features.add("builtin_prices")
 
         # runtime state
         self._filtered: float | None = None
@@ -125,6 +134,9 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._fetched_slots: list[PriceSlot] = []
         self._fetched_date: Any = None
         self._fetch_after: datetime | None = None
+        self.builtin_prices = not self.conf.get(CONF_PRICE)
+        self._np_cache: dict[Any, list[PriceSlot]] = {}
+        self._np_retry: dict[Any, datetime] = {}
 
     # ------------------------------------------------------------------ setup
     def supports(self, requires: tuple[str, ...]) -> bool:
@@ -233,7 +245,58 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
 
     # ----------------------------------------------------------------- prices
+    async def _fetch_nordpool(self, day: Any) -> list[PriceSlot]:
+        """Download one delivery day from the Nord Pool data portal."""
+        area = self.conf.get(CONF_AREA) or DEFAULT_AREA
+        vat = float(self.conf.get(CONF_VAT, DEFAULT_VAT) or 0)
+        url = NORDPOOL_URL.format(date=day.isoformat(), area=area)
+        try:
+            session = async_get_clientsession(self.hass)
+            async with session.get(url, timeout=20) as resp:
+                if resp.status != 200:
+                    return []
+                payload = await resp.json()
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.debug("SmartHP: Nord Pool download failed: %s", err)
+            return []
+        slots: list[PriceSlot] = []
+        for item in (payload or {}).get("multiAreaEntries") or []:
+            value = (item.get("entryPerArea") or {}).get(area)
+            start = dt_util.parse_datetime(str(item.get("deliveryStart")))
+            end = dt_util.parse_datetime(str(item.get("deliveryEnd")))
+            if value is None or start is None or end is None:
+                continue
+            # EUR/MWh without VAT -> EUR/kWh with VAT
+            slots.append(PriceSlot(start, end, round(float(value) / 1000 * (1 + vat / 100), 5)))
+        return slots
+
+    async def _builtin_slots(self, now: datetime) -> list[PriceSlot]:
+        """Built-in Nord Pool prices: yesterday, today and tomorrow (CET days)."""
+        cet_now = now.astimezone(dt_util.get_time_zone(NORDPOOL_TIMEZONE))
+        today = cet_now.date()
+        wanted = [today - timedelta(days=1), today, today + timedelta(days=1)]
+        for day in list(self._np_cache):
+            if day not in wanted:
+                del self._np_cache[day]
+        for day in wanted:
+            if day in self._np_cache:
+                continue
+            if day > today and cet_now.hour < 13:
+                continue  # tomorrow is published around 13:00 CET
+            retry = self._np_retry.get(day)
+            if retry and now < retry:
+                continue
+            self._np_retry[day] = now + PRICE_FETCH_RETRY
+            slots = await self._fetch_nordpool(day)
+            if slots:
+                self._np_cache[day] = slots
+        return sorted(
+            (s for day in self._np_cache.values() for s in day), key=lambda s: s.start
+        )
+
     async def _price_slots(self, now: datetime) -> list[PriceSlot]:
+        if self.builtin_prices:
+            return await self._builtin_slots(now)
         entity_id = self.conf.get(CONF_PRICE)
         state = self.hass.states.get(entity_id) if entity_id else None
         if state is None:
@@ -278,15 +341,35 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def _async_update_data(self) -> dict[str, Any]:
         now = dt_util.now()
         slots = await self._price_slots(now)
-        data = self._compute(now, slots)
+        if self.builtin_prices:
+            price = next((s.price for s in slots if s.start <= now < s.end), None)
+        else:
+            price = self._float(CONF_PRICE)
+        data = self._compute(now, slots, price)
+        today = [
+            s.price for s in slots
+            if s.start.astimezone(now.tzinfo).date() == now.date()
+        ]
+        data["current_price"] = price
+        data["price_stats"] = (
+            {
+                "today_min": min(today),
+                "today_max": max(today),
+                "today_average": round(sum(today) / len(today), 5),
+                "periods_today": len(today),
+            }
+            if today
+            else {}
+        )
         await self._apply(data)
         return data
 
-    def _compute(self, now: datetime, slots: list[PriceSlot]) -> dict[str, Any]:
+    def _compute(
+        self, now: datetime, slots: list[PriceSlot], price: float | None
+    ) -> dict[str, Any]:
         s = self.settings
         enabled = bool(s["enabled"])
         outdoor = self._float(CONF_OUTDOOR)
-        price = self._float(CONF_PRICE)
 
         # --- damped outdoor temperature
         if outdoor is not None:

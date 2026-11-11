@@ -1,5 +1,5 @@
 /* SmartHP Lovelace card and sidebar panel. No external dependencies. */
-const SMARTHP_VERSION = "0.1.0";
+const SMARTHP_VERSION = "0.2.0";
 
 const TEXT = {
   en: {
@@ -319,6 +319,7 @@ class SmartHPCard extends HTMLElement {
     if (map.outdoor_filtered) chip("outdoor_filtered", t.outdoor);
     if (map.target_flow) chip("target_flow", t.flow);
     if (map.price_level) chip("price_level", t.priceNow);
+    if (map.current_price) chip("current_price", "Nord Pool");
     if (map.dhw_target) chip("dhw_target", t.hotWater);
     if (map.sg_state) chip("sg_state", "SG Ready");
     card.append(chips);

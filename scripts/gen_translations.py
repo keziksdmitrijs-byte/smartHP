@@ -117,6 +117,7 @@ SENSOR = {
     "outdoor_filtered": (("Damped outdoor temperature", "Усреднённая наружная температура", "Vidējotā āra temperatūra"), None),
     "price_level": (("Price level", "Уровень цены", "Cenas līmenis"), LEVEL),
     "price_rank": (("Price rank today", "Место цены за сутки", "Cenas vieta diennaktī"), None),
+    "current_price": (("Electricity price", "Цена электричества", "Elektrības cena"), None),
     "dhw_target": (("Hot water target", "Целевая температура ГВС", "Karstā ūdens mērķa temperatūra"), None),
     "sg_state": (("SG Ready state", "Состояние SG Ready", "SG Ready stāvoklis"), None),
 }
@@ -135,12 +136,24 @@ MAIN_FIELDS = {
         ("Outdoor temperature sensor", "Датчик наружной температуры", "Āra temperatūras sensors"),
         None,
     ),
-    "price_sensor": (
-        ("Electricity price sensor (Nord Pool)", "Датчик цены электричества (Nord Pool)", "Elektrības cenas sensors (Nord Pool)"),
+    "nordpool_area": (
+        ("Nord Pool price area", "Ценовая зона Nord Pool", "Nord Pool cenu zona"),
         (
-            "Current price sensor of the Nord Pool integration (official or HACS).",
-            "Датчик текущей цены из интеграции Nord Pool (официальной или из HACS).",
-            "Nord Pool integrācijas (oficiālās vai HACS) pašreizējās cenas sensors.",
+            "SmartHP downloads the prices itself; no other integration is needed.",
+            "SmartHP сам загружает цены; другая интеграция не нужна.",
+            "SmartHP pats lejupielādē cenas; cita integrācija nav vajadzīga.",
+        ),
+    ),
+    "vat_percent": (
+        ("VAT added to the price", "НДС, добавляемый к цене", "Cenai pieskaitāmais PVN"),
+        None,
+    ),
+    "price_sensor": (
+        ("Own price sensor instead of built-in Nord Pool (optional)", "Свой датчик цены вместо встроенного Nord Pool (необязательно)", "Savs cenas sensors iebūvētā Nord Pool vietā (nav obligāti)"),
+        (
+            "Leave empty to use the built-in Nord Pool prices.",
+            "Оставьте пустым, чтобы использовать встроенные цены Nord Pool.",
+            "Atstājiet tukšu, lai izmantotu iebūvētās Nord Pool cenas.",
         ),
     ),
     "setpoint_entity": (

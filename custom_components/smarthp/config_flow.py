@@ -12,6 +12,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
+    CONF_AREA,
     CONF_AUX,
     CONF_BLOCK,
     CONF_BLOCK_INVERTED,
@@ -26,9 +27,13 @@ from .const import (
     CONF_SETPOINT_MODE,
     CONF_SG1,
     CONF_SG2,
+    CONF_VAT,
+    DEFAULT_AREA,
+    DEFAULT_VAT,
     DOMAIN,
     MODE_FLOW,
     MODE_OFFSET,
+    NORDPOOL_AREAS,
 )
 
 SENSOR = ["sensor", "input_number", "number"]
@@ -46,7 +51,18 @@ def _main_schema(with_name: bool) -> vol.Schema:
     fields.update(
         {
             vol.Required(CONF_OUTDOOR): _entity(SENSOR),
-            vol.Required(CONF_PRICE): _entity(SENSOR),
+            vol.Required(CONF_AREA, default=DEFAULT_AREA): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=NORDPOOL_AREAS, mode=selector.SelectSelectorMode.DROPDOWN
+                )
+            ),
+            vol.Required(CONF_VAT, default=DEFAULT_VAT): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0, max=50, step=0.1, unit_of_measurement="%",
+                    mode=selector.NumberSelectorMode.BOX,
+                )
+            ),
+            vol.Optional(CONF_PRICE): _entity(SENSOR),
             vol.Optional(CONF_SETPOINT): _entity(["number", "input_number", "climate"]),
             vol.Required(CONF_SETPOINT_MODE, default=MODE_FLOW): selector.SelectSelector(
                 selector.SelectSelectorConfig(

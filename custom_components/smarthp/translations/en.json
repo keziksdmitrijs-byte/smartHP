@@ -7,14 +7,17 @@
         "data": {
           "name": "Name",
           "outdoor_sensor": "Outdoor temperature sensor",
-          "price_sensor": "Electricity price sensor (Nord Pool)",
+          "nordpool_area": "Nord Pool price area",
+          "vat_percent": "VAT added to the price",
+          "price_sensor": "Own price sensor instead of built-in Nord Pool (optional)",
           "setpoint_entity": "Heat pump setpoint (optional)",
           "setpoint_mode": "What to write to the setpoint",
           "block_switch": "Heat pump enable/block switch (optional)",
           "block_inverted": "Switch ON means the heat pump is blocked"
         },
         "data_description": {
-          "price_sensor": "Current price sensor of the Nord Pool integration (official or HACS).",
+          "nordpool_area": "SmartHP downloads the prices itself; no other integration is needed.",
+          "price_sensor": "Leave empty to use the built-in Nord Pool prices.",
           "setpoint_entity": "Number or climate entity that SmartHP writes the calculated value to.",
           "block_switch": "Relay used to stop the heat pump during expensive hours.",
           "block_inverted": "Leave off if the switch ON means the heat pump may run."
@@ -49,14 +52,17 @@
         "description": "Choose the sensors SmartHP reads and the heat pump entities it controls.",
         "data": {
           "outdoor_sensor": "Outdoor temperature sensor",
-          "price_sensor": "Electricity price sensor (Nord Pool)",
+          "nordpool_area": "Nord Pool price area",
+          "vat_percent": "VAT added to the price",
+          "price_sensor": "Own price sensor instead of built-in Nord Pool (optional)",
           "setpoint_entity": "Heat pump setpoint (optional)",
           "setpoint_mode": "What to write to the setpoint",
           "block_switch": "Heat pump enable/block switch (optional)",
           "block_inverted": "Switch ON means the heat pump is blocked"
         },
         "data_description": {
-          "price_sensor": "Current price sensor of the Nord Pool integration (official or HACS).",
+          "nordpool_area": "SmartHP downloads the prices itself; no other integration is needed.",
+          "price_sensor": "Leave empty to use the built-in Nord Pool prices.",
           "setpoint_entity": "Number or climate entity that SmartHP writes the calculated value to.",
           "block_switch": "Relay used to stop the heat pump during expensive hours.",
           "block_inverted": "Leave off if the switch ON means the heat pump may run."
@@ -273,6 +279,9 @@
       },
       "price_rank": {
         "name": "Price rank today"
+      },
+      "current_price": {
+        "name": "Electricity price"
       },
       "dhw_target": {
         "name": "Hot water target"

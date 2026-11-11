@@ -104,7 +104,7 @@ async def test_config_flow(hass: HomeAssistant):
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "My HP"
-    assert result["data"] == BASE
+    assert result["data"] == {**BASE, "nordpool_area": "LV", "vat_percent": 21.0}
     await hass.async_block_till_done()
 
 
@@ -287,6 +287,75 @@ async def test_unavailable_outdoor_writes_nothing(hass: HomeAssistant, freezer):
     _, calls = await _setup(hass, BASE, freezer, 12, outdoor="unavailable")
     assert hass.states.get("sensor.smarthp_status").state == "no_data"
     assert calls["set_value"] == []
+
+
+def _nordpool_payload(day: str, first_utc: datetime) -> dict:
+    """96 quarter-hour prices; local (Riga) hour N costs N * 10 EUR/MWh."""
+    riga = dt_util.get_time_zone("Europe/Riga")
+    entries = []
+    for i in range(96):
+        start = first_utc + timedelta(minutes=15 * i)
+        entries.append(
+            {
+                "deliveryStart": start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "deliveryEnd": (start + timedelta(minutes=15)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "entryPerArea": {"LV": start.astimezone(riga).hour * 10.0},
+            }
+        )
+    return {"deliveryDateCET": day, "currency": "EUR", "multiAreaEntries": entries}
+
+
+async def test_builtin_nordpool(hass: HomeAssistant, freezer, aioclient_mock):
+    from datetime import timezone
+
+    from custom_components.smarthp.const import NORDPOOL_URL
+
+    for day, first in (
+        ("2026-01-04", datetime(2026, 1, 3, 23, tzinfo=timezone.utc)),
+        ("2026-01-05", datetime(2026, 1, 4, 23, tzinfo=timezone.utc)),
+    ):
+        aioclient_mock.get(
+            NORDPOOL_URL.format(date=day, area="LV"), json=_nordpool_payload(day, first)
+        )
+    aioclient_mock.get(NORDPOOL_URL.format(date="2026-01-06", area="LV"), status=204)
+
+    data = {k: v for k, v in BASE.items() if k != "price_sensor"}
+    data.update({"nordpool_area": "LV", "vat_percent": 21.0})
+    _, calls = await _setup(hass, data, freezer, 20)  # 20:30 Riga
+    price = hass.states.get("sensor.smarthp_current_price")
+    # 200 EUR/MWh -> 0.2 EUR/kWh + 21 % VAT
+    assert float(price.state) == 0.242
+    assert price.attributes["periods_today"] == 96
+    assert price.attributes["today_max"] == 0.2783
+    assert hass.states.get("sensor.smarthp_price_level").state == "expensive"
+    assert _last_value(calls, "input_number.hp_flow") == 35.5
+    # yesterday + today are downloaded once; tomorrow answered 204 and is not retried at once
+    count = aioclient_mock.call_count
+    assert count == 3
+    coordinator = next(iter(hass.data[DOMAIN].values()))
+    await coordinator.async_refresh()
+    assert aioclient_mock.call_count == count
+
+    freezer.move_to(datetime(2026, 1, 5, 3, 30, tzinfo=dt_util.get_time_zone("Europe/Riga")))
+    await coordinator.async_refresh()
+    assert hass.states.get("sensor.smarthp_price_level").state == "cheap"
+    assert _last_value(calls, "input_number.hp_flow") == 39.5
+
+
+async def test_builtin_nordpool_offline(hass: HomeAssistant, freezer, aioclient_mock):
+    import aiohttp
+
+    from custom_components.smarthp.const import NORDPOOL_URL
+
+    for day in ("2026-01-04", "2026-01-05", "2026-01-06"):
+        aioclient_mock.get(
+            NORDPOOL_URL.format(date=day, area="LV"), exc=aiohttp.ClientError("offline")
+        )
+    data = {k: v for k, v in BASE.items() if k != "price_sensor"}
+    _, calls = await _setup(hass, data, freezer, 20)
+    assert hass.states.get("sensor.smarthp_price_level").state == "unknown"
+    # heating curve keeps working without prices
+    assert _last_value(calls, "input_number.hp_flow") == 37.5
 
 
 def test_every_entity_is_translated():

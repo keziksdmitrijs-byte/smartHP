@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 DOMAIN = "smarthp"
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 PLATFORMS = ["binary_sensor", "number", "select", "sensor", "switch", "time"]
 
 FRONTEND_URL = "/smarthp_static/smarthp-card.js"
@@ -14,6 +14,8 @@ PANEL_URL_PATH = "smarthp"
 # --- config entry keys -------------------------------------------------------
 CONF_OUTDOOR = "outdoor_sensor"
 CONF_PRICE = "price_sensor"
+CONF_AREA = "nordpool_area"
+CONF_VAT = "vat_percent"
 CONF_SETPOINT = "setpoint_entity"
 CONF_SETPOINT_MODE = "setpoint_mode"
 CONF_BLOCK = "block_switch"
@@ -26,6 +28,19 @@ CONF_DHW_TEMP = "dhw_sensor"
 CONF_DHW_SETPOINT = "dhw_setpoint_entity"
 CONF_CIRC = "circulation_pump"
 CONF_AUX = "aux_heater"
+
+NORDPOOL_URL = (
+    "https://dataportal-api.nordpoolgroup.com/api/DayAheadPrices"
+    "?date={date}&market=DayAhead&deliveryArea={area}&currency=EUR"
+)
+NORDPOOL_TIMEZONE = "Europe/Stockholm"
+NORDPOOL_AREAS = [
+    "LV", "LT", "EE", "FI", "SE1", "SE2", "SE3", "SE4",
+    "NO1", "NO2", "NO3", "NO4", "NO5", "DK1", "DK2",
+    "PL", "GER", "AT", "NL", "BE", "FR",
+]
+DEFAULT_AREA = "LV"
+DEFAULT_VAT = 21.0
 
 MODE_FLOW = "flow"
 MODE_OFFSET = "offset"

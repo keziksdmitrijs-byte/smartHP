@@ -13,6 +13,8 @@ from homeassistant.components.sensor import (
 from homeassistant.const import PERCENTAGE, UnitOfTemperature
 
 from .const import DOMAIN, F_DHW, F_SG, LEVELS, STATUSES
+
+F_BUILTIN = "builtin_prices"
 from .entity import SmartHPEntity
 
 
@@ -33,6 +35,7 @@ SENSORS: tuple[SensorDesc, ...] = (
     SensorDesc("outdoor_filtered", "temp", icon="mdi:thermometer"),
     SensorDesc("price_level", "enum", options=tuple(LEVELS), icon="mdi:cash-clock"),
     SensorDesc("price_rank", "percent", icon="mdi:sort-numeric-ascending"),
+    SensorDesc("current_price", "price", (F_BUILTIN,), icon="mdi:currency-eur"),
     SensorDesc("dhw_target", "temp", (F_DHW,), icon="mdi:water-thermometer"),
     SensorDesc("sg_state", "plain", (F_SG,), icon="mdi:transmission-tower"),
 )
@@ -63,6 +66,10 @@ class SmartHPSensor(SmartHPEntity, SensorEntity):
         elif desc.kind == "percent":
             self._attr_native_unit_of_measurement = PERCENTAGE
             self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif desc.kind == "price":
+            self._attr_native_unit_of_measurement = "EUR/kWh"
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+            self._attr_suggested_display_precision = 4
         elif desc.kind == "enum":
             self._attr_device_class = SensorDeviceClass.ENUM
             self._attr_options = list(desc.options)
@@ -76,6 +83,8 @@ class SmartHPSensor(SmartHPEntity, SensorEntity):
         data = self.coordinator.data or {}
         if self.key == "target_flow":
             return {f"offset_{k}": v for k, v in data.get("offsets", {}).items()}
+        if self.key == "current_price":
+            return dict(data.get("price_stats") or {})
         if self.key == "price_level":
             return {"price": data.get("price")}
         return None
