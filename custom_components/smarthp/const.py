@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 DOMAIN = "smarthp"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 PLATFORMS = ["binary_sensor", "number", "select", "sensor", "switch", "time"]
 
 FRONTEND_URL = "/smarthp_static/smarthp-card.js"

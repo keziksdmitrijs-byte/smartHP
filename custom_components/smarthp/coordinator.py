@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from bisect import bisect_left
 from collections import deque
 from datetime import datetime, timedelta
 import logging
@@ -113,8 +114,6 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         ):
             if self.conf.get(conf_key):
                 self.features.add(feature)
-        if not self.conf.get(CONF_PRICE):
-            self.features.add("builtin_prices")
 
         # runtime state
         self._filtered: float | None = None
@@ -349,6 +348,31 @@ class SmartHPCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             if s.start.astimezone(now.tzinfo).date() == now.date()
         ]
         data["current_price"] = price
+        s = self.settings
+        today_slots = [
+            sl for sl in slots if sl.start.astimezone(now.tzinfo).date() == now.date()
+        ]
+        ordered = sorted(sl.price for sl in today_slots)
+        flat = len(ordered) < 4 or ordered[0] == ordered[-1]
+        data["price_today"] = [
+            {
+                "start": sl.start.astimezone(now.tzinfo).isoformat(timespec="minutes"),
+                "end": sl.end.astimezone(now.tzinfo).isoformat(timespec="minutes"),
+                "price": sl.price,
+                "level": classify(
+                    (0.5 if len(ordered) >= 4 else None)
+                    if flat
+                    else bisect_left(ordered, sl.price) / len(ordered),
+                    sl.price,
+                    s["cheap_percent"],
+                    s["expensive_percent"],
+                    bool(s["abs_thresholds"]),
+                    s["price_always_cheap"],
+                    s["price_always_expensive"],
+                ),
+            }
+            for sl in today_slots
+        ]
         data["price_stats"] = (
             {
                 "today_min": min(today),

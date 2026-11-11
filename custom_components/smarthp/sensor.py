@@ -12,9 +12,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import PERCENTAGE, UnitOfTemperature
 
-from .const import DOMAIN, F_DHW, F_SG, LEVELS, STATUSES
-
-F_BUILTIN = "builtin_prices"
+from .const import CONF_PRICE, DOMAIN, F_DHW, F_SG, LEVELS, STATUSES
 from .entity import SmartHPEntity
 
 
@@ -35,7 +33,7 @@ SENSORS: tuple[SensorDesc, ...] = (
     SensorDesc("outdoor_filtered", "temp", icon="mdi:thermometer"),
     SensorDesc("price_level", "enum", options=tuple(LEVELS), icon="mdi:cash-clock"),
     SensorDesc("price_rank", "percent", icon="mdi:sort-numeric-ascending"),
-    SensorDesc("current_price", "price", (F_BUILTIN,), icon="mdi:currency-eur"),
+    SensorDesc("current_price", "price", icon="mdi:currency-eur"),
     SensorDesc("dhw_target", "temp", (F_DHW,), icon="mdi:water-thermometer"),
     SensorDesc("sg_state", "plain", (F_SG,), icon="mdi:transmission-tower"),
 )
@@ -56,23 +54,34 @@ class SmartHPSensor(SmartHPEntity, SensorEntity):
     def __init__(self, coordinator, desc: SensorDesc) -> None:
         super().__init__(coordinator, "sensor", desc.key)
         self._attr_icon = desc.icon
+        self._unit: str | None = None
         if desc.kind == "temp":
             self._attr_device_class = SensorDeviceClass.TEMPERATURE
-            self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+            self._unit = UnitOfTemperature.CELSIUS
             self._attr_state_class = SensorStateClass.MEASUREMENT
         elif desc.kind == "delta":
-            self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+            self._unit = UnitOfTemperature.CELSIUS
             self._attr_state_class = SensorStateClass.MEASUREMENT
         elif desc.kind == "percent":
-            self._attr_native_unit_of_measurement = PERCENTAGE
+            self._unit = PERCENTAGE
             self._attr_state_class = SensorStateClass.MEASUREMENT
         elif desc.kind == "price":
-            self._attr_native_unit_of_measurement = "EUR/kWh"
             self._attr_state_class = SensorStateClass.MEASUREMENT
             self._attr_suggested_display_precision = 4
         elif desc.kind == "enum":
             self._attr_device_class = SensorDeviceClass.ENUM
             self._attr_options = list(desc.options)
+
+    _unrecorded_attributes = frozenset({"today"})
+
+    @property
+    def native_unit_of_measurement(self) -> str | None:
+        if self.key != "current_price":
+            return self._unit
+        if self.coordinator.builtin_prices:
+            return "EUR/kWh"
+        source = self.hass.states.get(self.coordinator.conf.get(CONF_PRICE) or "")
+        return source.attributes.get("unit_of_measurement") if source else None
 
     @property
     def native_value(self) -> Any:
@@ -84,7 +93,7 @@ class SmartHPSensor(SmartHPEntity, SensorEntity):
         if self.key == "target_flow":
             return {f"offset_{k}": v for k, v in data.get("offsets", {}).items()}
         if self.key == "current_price":
-            return dict(data.get("price_stats") or {})
+            return {**(data.get("price_stats") or {}), "today": data.get("price_today") or []}
         if self.key == "price_level":
             return {"price": data.get("price")}
         return None

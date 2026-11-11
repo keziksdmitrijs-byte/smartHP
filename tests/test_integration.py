@@ -135,6 +135,8 @@ async def test_expensive_hour_only_shifts_setpoint(hass: HomeAssistant, freezer)
     assert not _switched(calls, "on", "switch.sg1")
     assert hass.states.get("sensor.smarthp_sg_state").state == "2"
     assert hass.states.get("sensor.smarthp_status").state == "saving"
+    # with an own price sensor the chart data is still provided
+    assert len(hass.states.get("sensor.smarthp_current_price").attributes["today"]) == 24
 
 
 async def test_cheap_hour_boosts_flow_and_dhw(hass: HomeAssistant, freezer):
@@ -324,6 +326,14 @@ async def test_builtin_nordpool(hass: HomeAssistant, freezer, aioclient_mock):
     # 200 EUR/MWh -> 0.2 EUR/kWh + 21 % VAT
     assert float(price.state) == 0.242
     assert price.attributes["periods_today"] == 96
+    assert price.attributes["unit_of_measurement"] == "EUR/kWh"
+    today = price.attributes["today"]
+    assert len(today) == 96
+    assert today[0] == {
+        "start": "2026-01-05T00:00+02:00", "end": "2026-01-05T00:15+02:00",
+        "price": 0.0, "level": "cheap",
+    }
+    assert today[-1]["level"] == "expensive" and today[48]["level"] == "normal"
     assert price.attributes["today_max"] == 0.2783
     assert hass.states.get("sensor.smarthp_price_level").state == "expensive"
     assert _last_value(calls, "input_number.hp_flow") == 34.5
